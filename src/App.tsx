@@ -533,10 +533,11 @@ function App() {
             <table className="summary-table">
               <thead>
                 <tr>
-                  <th>Absent teacher</th>
+                  <th>Teacher on leave</th>
                   <th>Period</th>
                   <th>Class</th>
                   <th>Substitute</th>
+                  <th className="summary-signature-th">Signature</th>
                   <th className="summary-actions-th">Actions</th>
                 </tr>
               </thead>
@@ -604,6 +605,7 @@ function App() {
                             row.sub.substituteTeacher
                           )}
                         </td>
+                        <td className="summary-signature" aria-label="Signature" />
                         <td className="summary-actions">
                           <div className="summary-actions-inner">
                             {isEditing ? (
@@ -658,9 +660,8 @@ function App() {
         <section className="card">
           <h2>Download PDF</h2>
           <p className="hint">
-            <strong>Substitution summary PDF</strong> uses a light layout with the same columns as
-            above; absent-teacher blocks are separated by <strong>spacing</strong>, with a dark outline
-            around each block.
+            <strong>Substitution summary PDF</strong> uses the same columns as above, including a blank{' '}
+            <strong>Signature</strong> column for printing.
           </p>
           <div className="pdf-actions">
             <button

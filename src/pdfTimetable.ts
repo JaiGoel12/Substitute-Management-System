@@ -22,10 +22,11 @@ function buildSummaryBodyFlat(group: {
     slotPeriodLabel(row.sub.slotKey),
     row.sub.className,
     row.sub.substituteTeacher,
+    '',
   ])
 }
 
-/** Absent teacher once per block (merged cell). */
+/** Teacher on leave once per block (merged cell). */
 function buildSummaryBodyRowspan(group: {
   absent: string
   rows: { sub: Substitution; originalIndex: number }[]
@@ -48,9 +49,10 @@ function buildSummaryBodyRowspan(group: {
         period,
         row.sub.className,
         row.sub.substituteTeacher,
+        '',
       ])
     } else {
-      body.push([period, row.sub.className, row.sub.substituteTeacher])
+      body.push([period, row.sub.className, row.sub.substituteTeacher, ''])
     }
   })
   return body
@@ -99,16 +101,18 @@ export function downloadSubstitutionSummaryPdf(
   doc.text(dateStr, pageW - margin.right - dateW, 16)
 
   const columnStylesRowspan = {
-    0: { cellWidth: 42 },
-    1: { cellWidth: 22 },
-    2: { cellWidth: 38 },
+    0: { cellWidth: 38 },
+    1: { cellWidth: 18 },
+    2: { cellWidth: 32 },
     3: { cellWidth: 'auto' as const },
+    4: { cellWidth: 24 },
   }
   const columnStylesFlat = {
-    0: { cellWidth: 42, fontStyle: 'bold' as const },
-    1: { cellWidth: 22 },
-    2: { cellWidth: 38 },
+    0: { cellWidth: 38, fontStyle: 'bold' as const },
+    1: { cellWidth: 18 },
+    2: { cellWidth: 32 },
     3: { cellWidth: 'auto' as const },
+    4: { cellWidth: 24 },
   }
 
   let startY = 24
@@ -120,7 +124,7 @@ export function downloadSubstitutionSummaryPdf(
 
     autoTable(doc, {
       startY,
-      head: [['Absent teacher', 'Period', 'Class', 'Substitute']],
+      head: [['Teacher on leave', 'Period', 'Class', 'Substitute', 'Signature']],
       showHead: 'everyPage',
       body,
       theme: 'grid',
