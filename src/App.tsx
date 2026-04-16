@@ -537,7 +537,6 @@ function App() {
                   <th>Period</th>
                   <th>Class</th>
                   <th>Substitute</th>
-                  <th className="summary-signature-th">Signature</th>
                   <th className="summary-actions-th">Actions</th>
                 </tr>
               </thead>
@@ -605,7 +604,6 @@ function App() {
                             row.sub.substituteTeacher
                           )}
                         </td>
-                        <td className="summary-signature" aria-label="Signature" />
                         <td className="summary-actions">
                           <div className="summary-actions-inner">
                             {isEditing ? (
@@ -660,8 +658,8 @@ function App() {
         <section className="card">
           <h2>Download PDF</h2>
           <p className="hint">
-            <strong>Substitution summary PDF</strong> uses the same columns as above, including a blank{' '}
-            <strong>Signature</strong> column for printing.
+            The <strong>substitution summary PDF</strong> adds a blank <strong>Signature</strong> column for
+            printing; the on-screen table above does not show that column.
           </p>
           <div className="pdf-actions">
             <button

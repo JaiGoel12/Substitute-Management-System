@@ -320,17 +320,6 @@ select {
   font-weight: 600;
 }
 
-.summary-signature-th {
-  min-width: 6rem;
-  width: 7.5rem;
-}
-
-.summary-signature {
-  min-width: 6rem;
-  min-height: 2.25rem;
-  border-right: 1px solid var(--border);
-}
-
 .summary-actions-th {
   width: auto;
   min-width: 11rem;
