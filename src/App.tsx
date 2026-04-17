@@ -311,12 +311,13 @@ function App() {
   return (
     <div className="app">
       <header className="header">
+        <p className="header-kicker">Substitution planner</p>
         <h1>Substitute timetable</h1>
       </header>
 
       {baseGrid && (
         <section className="card">
-          <h2>1. Day + absent teachers</h2>
+          <h2>Day + absent teachers</h2>
           {days.length > 1 && (
             <div className="row">
               <label>
@@ -346,9 +347,7 @@ function App() {
 
           {assignPhase === 'mark-absent' && (
             <fieldset className="absent-fieldset">
-              <legend>
-                <span className="step-badge">2</span> Who is absent?
-              </legend>
+              <legend>Who is absent?</legend>
               <p className="hint inline-hint">
                 These teachers cannot be assigned as substitutes in any period.
               </p>
@@ -379,9 +378,7 @@ function App() {
 
           {assignPhase === 'choose-subs' && orderedAbsent.length > 0 && day && (
             <div className="assign-block">
-              <h3 className="assign-title">
-                <span className="step-badge">3</span> Substitutes (per period, per class)
-              </h3>
+              <h3 className="assign-title">Substitutes (per period, per class)</h3>
               <p className="hint">
                 For each <strong>class period</strong>, pick a teacher who is free then. Teachers
                 already assigned (including from earlier confirmations in this session) are hidden
