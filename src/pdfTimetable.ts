@@ -1,8 +1,21 @@
 import { jsPDF } from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import type { Substitution, TeacherGrid } from './types'
+import { roomForClass } from './classRoomMap'
 import { groupSubsByAbsent, slotPeriodLabel } from './summaryTableModel'
 import { allClassesFromGrid, invertToClassCentric, periodsForDay } from './substituteLogic'
+
+/** Shown at the top of every exported PDF. */
+const PDF_SCHOOL_HEADER = 'GMSSSS Jahajpul, Hisar'
+
+function drawPdfSchoolHeader(doc: jsPDF): void {
+  const pageW = doc.internal.pageSize.getWidth()
+  doc.setFont('helvetica', 'bold')
+  doc.setFontSize(12)
+  doc.setTextColor(33, 37, 41)
+  doc.text(PDF_SCHOOL_HEADER, pageW / 2, 10, { align: 'center' })
+  doc.setFont('helvetica', 'normal')
+}
 
 function slotKey(day: string, period: string): string {
   return `${day.trim()}|${period.trim()}`
@@ -17,13 +30,17 @@ function buildSummaryBodyFlat(group: {
   absent: string
   rows: { sub: Substitution; originalIndex: number }[]
 }): string[][] {
-  return group.rows.map((row) => [
-    group.absent,
-    slotPeriodLabel(row.sub.slotKey),
-    row.sub.className,
-    row.sub.substituteTeacher,
-    '',
-  ])
+  return group.rows.map((row) => {
+    const room = roomForClass(row.sub.className)
+    return [
+      group.absent,
+      slotPeriodLabel(row.sub.slotKey),
+      row.sub.className,
+      room || '—',
+      row.sub.substituteTeacher,
+      '',
+    ]
+  })
 }
 
 /** Teacher on leave once per block (merged cell). */
@@ -35,6 +52,7 @@ function buildSummaryBodyRowspan(group: {
   const body: SummaryCell[][] = []
   group.rows.forEach((row, i) => {
     const period = slotPeriodLabel(row.sub.slotKey)
+    const room = roomForClass(row.sub.className) || '—'
     if (i === 0) {
       body.push([
         {
@@ -48,11 +66,12 @@ function buildSummaryBodyRowspan(group: {
         },
         period,
         row.sub.className,
+        room,
         row.sub.substituteTeacher,
         '',
       ])
     } else {
-      body.push([period, row.sub.className, row.sub.substituteTeacher, ''])
+      body.push([period, row.sub.className, room, row.sub.substituteTeacher, ''])
     }
   })
   return body
@@ -90,32 +109,36 @@ export function downloadSubstitutionSummaryPdf(
   const margin = { left: 14, right: 14 }
   const gapBetweenGroupsMm = 10
 
+  drawPdfSchoolHeader(doc)
+
   doc.setTextColor(33, 37, 41)
   doc.setFontSize(14)
-  doc.text(title, margin.left, 16)
+  doc.text(title, margin.left, 19)
 
   const dateStr = formatSubstitutionDate()
   doc.setFontSize(14)
   doc.setTextColor(33, 37, 41)
   const dateW = doc.getTextWidth(dateStr)
-  doc.text(dateStr, pageW - margin.right - dateW, 16)
+  doc.text(dateStr, pageW - margin.right - dateW, 19)
 
   const columnStylesRowspan = {
-    0: { cellWidth: 38 },
-    1: { cellWidth: 18 },
-    2: { cellWidth: 32 },
-    3: { cellWidth: 'auto' as const },
-    4: { cellWidth: 24 },
+    0: { cellWidth: 36 },
+    1: { cellWidth: 16 },
+    2: { cellWidth: 28 },
+    3: { cellWidth: 16 },
+    4: { cellWidth: 'auto' as const },
+    5: { cellWidth: 22 },
   }
   const columnStylesFlat = {
-    0: { cellWidth: 38, fontStyle: 'bold' as const },
-    1: { cellWidth: 18 },
-    2: { cellWidth: 32 },
-    3: { cellWidth: 'auto' as const },
-    4: { cellWidth: 24 },
+    0: { cellWidth: 36, fontStyle: 'bold' as const },
+    1: { cellWidth: 16 },
+    2: { cellWidth: 28 },
+    3: { cellWidth: 16 },
+    4: { cellWidth: 'auto' as const },
+    5: { cellWidth: 22 },
   }
 
-  let startY = 24
+  let startY = 27
   const rowspanLimit = maxRowsForRowspanPdf(doc)
 
   groups.forEach((group, gIdx) => {
@@ -124,7 +147,7 @@ export function downloadSubstitutionSummaryPdf(
 
     autoTable(doc, {
       startY,
-      head: [['Teacher on leave', 'Period', 'Class', 'Substitute', 'Signature']],
+      head: [['Teacher on leave', 'Period', 'Class', 'Room No.', 'Substitute', 'Signature']],
       showHead: 'everyPage',
       body,
       theme: 'grid',
@@ -191,13 +214,14 @@ export function downloadSubstitutedClassTimetablePdf(
   })
 
   const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' })
+  drawPdfSchoolHeader(doc)
   doc.setFontSize(14)
   const dayTitle = day.trim() === 'Timetable' ? 'Daily timetable' : day.trim()
-  doc.text(`${title} — ${dayTitle}`, 14, 16)
+  doc.text(`${title} — ${dayTitle}`, 14, 19)
   doc.setFontSize(9)
 
   autoTable(doc, {
-    startY: 22,
+    startY: 25,
     head: [head],
     body,
     styles: { fontSize: 8, cellPadding: 1.5 },
