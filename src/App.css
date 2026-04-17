@@ -10,13 +10,6 @@
   margin: 0 0 0.5rem;
 }
 
-.lede {
-  margin: 0;
-  color: var(--text);
-  font-size: 0.95rem;
-  line-height: 1.5;
-}
-
 .card {
   margin-top: 1.5rem;
   padding: 1.25rem 1.25rem;
@@ -89,38 +82,10 @@
   }
 }
 
-.file input {
-  display: none;
-}
-
-.file span {
-  display: inline-block;
-  padding: 0.5rem 1rem;
-  border: 1px dashed var(--border);
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 0.95rem;
-}
-
-.file span:hover {
-  border-color: var(--accent);
-  background: var(--accent-bg);
-}
-
-.file input:disabled + span {
-  opacity: 0.65;
-  cursor: wait;
-  pointer-events: none;
-}
-
 .hint {
   margin: 0.75rem 0 0;
   font-size: 0.85rem;
   opacity: 0.9;
-}
-
-.default-data-hint {
-  margin: 0 0 0.75rem !important;
 }
 
 .row {

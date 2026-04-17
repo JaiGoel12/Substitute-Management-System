@@ -69,7 +69,6 @@ function effectiveSubstitutePick(
 
 function App() {
   const [error, setError] = useState<string | null>(null)
-  const [loadingFile, setLoadingFile] = useState(false)
   const [baseGrid, setBaseGrid] = useState<TeacherGrid | null>(null)
   const [subs, setSubs] = useState<Substitution[]>([])
   /** `makePickKey(slot, absent)` while editing that row’s substitute */
@@ -138,7 +137,6 @@ function App() {
       setAbsentees([])
       setSubstitutePicks({})
       setAssignPhase('mark-absent')
-      setLoadingFile(true)
       try {
         const res = await fetch(DEFAULT_TIMETABLE_URL)
         if (!res.ok) {
@@ -153,11 +151,11 @@ function App() {
         if (!cancelled) {
           setBaseGrid(null)
           setError(
-            e instanceof Error ? e.message : 'Could not load default timetable. Upload a file below.',
+            e instanceof Error
+              ? e.message
+              : 'Could not load default timetable. Check that Substitution_System.xlsx is in the public folder.',
           )
         }
-      } finally {
-        if (!cancelled) setLoadingFile(false)
       }
     }
     void loadDefault()
@@ -165,26 +163,6 @@ function App() {
       cancelled = true
     }
   }, [])
-
-  async function onFile(file: File) {
-    setError(null)
-    setSubs([])
-    setEditingPickKey(null)
-    setEditSubstituteDraft('')
-    setAbsentees([])
-    setSubstitutePicks({})
-    setAssignPhase('mark-absent')
-    setLoadingFile(true)
-    try {
-      const buf = await file.arrayBuffer()
-      await ingestArrayBuffer(buf)
-    } catch (e) {
-      setBaseGrid(null)
-      setError(e instanceof Error ? e.message : 'Could not read file.')
-    } finally {
-      setLoadingFile(false)
-    }
-  }
 
   function toggleAbsent(name: string) {
     setAbsentees((prev) => {
@@ -334,46 +312,11 @@ function App() {
     <div className="app">
       <header className="header">
         <h1>Substitute timetable</h1>
-        <p className="lede">
-          Mark <strong>who is absent</strong> first. For each absent teacher, the app goes through{' '}
-          <strong>every period</strong>: if they are <strong>Free</strong>, nothing is needed; if
-          they have a <strong>class</strong>, you choose a substitute from teachers who are{' '}
-          <strong>free in that same period</strong>. Absent teachers never appear as substitutes. The
-          summary shows absent teacher, period, class, and who will cover.
-        </p>
       </header>
-
-      <section className="card">
-        <h2>1. Timetable data</h2>
-        <p className="hint default-data-hint">
-          The app loads <strong>Substitution_System.xlsx</strong> from the project automatically on
-          start. Use <strong>Choose file</strong> only if you want to replace it for this session.
-        </p>
-        <label className="file">
-          <input
-            type="file"
-            accept=".csv,.xlsx,.xls"
-            disabled={loadingFile}
-            onChange={(e) => {
-              const f = e.target.files?.[0]
-              if (f) void onFile(f)
-              e.target.value = ''
-            }}
-          />
-          <span>{loadingFile ? 'Reading file…' : 'Choose CSV or Excel file (optional)'}</span>
-        </label>
-        <p className="hint">
-          Layout: <code>Teacher</code>, <code>P1</code>…<code>P6</code>. <code>Free</code> or blank =
-          free period.{' '}
-          <a href="/sample-teacher-rows.csv" download>
-            Sample CSV
-          </a>
-        </p>
-      </section>
 
       {baseGrid && (
         <section className="card">
-          <h2>2. Day + absent teachers</h2>
+          <h2>1. Day + absent teachers</h2>
           {days.length > 1 && (
             <div className="row">
               <label>
@@ -404,7 +347,7 @@ function App() {
           {assignPhase === 'mark-absent' && (
             <fieldset className="absent-fieldset">
               <legend>
-                <span className="step-badge">3</span> Who is absent?
+                <span className="step-badge">2</span> Who is absent?
               </legend>
               <p className="hint inline-hint">
                 These teachers cannot be assigned as substitutes in any period.
@@ -437,7 +380,7 @@ function App() {
           {assignPhase === 'choose-subs' && orderedAbsent.length > 0 && day && (
             <div className="assign-block">
               <h3 className="assign-title">
-                <span className="step-badge">4</span> Substitutes (per period, per class)
+                <span className="step-badge">3</span> Substitutes (per period, per class)
               </h3>
               <p className="hint">
                 For each <strong>class period</strong>, pick a teacher who is free then. Teachers
